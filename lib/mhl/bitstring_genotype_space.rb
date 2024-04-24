@@ -6,6 +6,8 @@ module MHL
   class BitstringGenotypeSpace
     def initialize(opts)
       @bitstring_length = opts[:bitstring_length].to_i
+      @mutation_threshold = opts[:mutation_threshold] || 0.5
+      @recombination_threshold = opts[:recombination_threshold] || 0.5
       unless @bitstring_length and @bitstring_length > 0
         raise ArgumentError, 'Must have positive integer bitstring_length'
       end
@@ -75,7 +77,7 @@ module MHL
           str = (0...@bitstring_length).inject("") do |s,i|
             s << ((rand < random_percentage_of_ones) ? '1' : '0')
           end
-          BitString.new(str, size)
+          BitString.new(str, @bitstring_length)
         end
       end
 
