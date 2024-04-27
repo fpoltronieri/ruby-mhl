@@ -2,6 +2,11 @@ require 'erv'
 require 'logger'
 require 'concurrent'
 
+# Grey Wolf Optimizer (GWO) is a population-based optimization algorithm
+# that is inspired by the social hierarchy and hunting behavior of grey wolves.
+# Seyedali Mirjalili, Seyed Mohammad Mirjalili, Andrew Lewis, Grey Wolf Optimizer,
+# Advances in Engineering Software, Volume 69, March 2014, Pages 46-61.
+
 
 module MHL
   class GreyWolfSolver 
@@ -14,6 +19,8 @@ module MHL
       end
 
       @exit_condition   = opts[:exit_condition]
+      # extract from the exit condition the number of iterations
+      @max_iterations = opts[:iterations] || 100
       @start_population = opts[:start_population]
       # Initialize constraints
       @constraints = opts[:constraints]
@@ -98,7 +105,7 @@ module MHL
       begin
         iter += 1
         # Update the positions of the wolves
-        positions = update_positions(positions, fitness)
+        positions = update_positions(positions, fitness, iter)
         # Update the fitness of the wolves
         if @concurrent
           futures = positions.map do |pos|
@@ -124,7 +131,7 @@ module MHL
       overall_best
     end
 
-    def update_positions(positions, fitness)
+    def update_positions(positions, fitness, iteration)
       # get the alpha, beta, and delta wolves
       alpha, beta, delta = find_alpha_beta_delta(fitness)
       alpha = positions[alpha]
@@ -132,26 +139,27 @@ module MHL
       delta = positions[delta]
 
       #warn "alpha: #{alpha}, beta: #{beta}, delta: #{delta}"
-      
+
       positions.map do |pos|
         new_positions = []
-
+        # a is decreased during the iterations from 2 to 0
+        # as in the grey wolf paper
+        a = 2 - iteration * (2.0 / @max_iterations)
         @dimensions.times do |i|
-          a1, c1 = 2 * rand - 1, 2 * rand - 1 
+          a1, c1 =  a * (2 * rand - 1), 2 * rand
           d_alpha = (c1 * alpha[i] - pos[i]).abs
           #warn "d_alpha: #{d_alpha}"
           x1 = alpha[i] - a1 * d_alpha
 
-          a2, c2 = 2 * rand - 1, 2 * rand - 1 
+          a2, c2 = a * (2 * rand - 1), 2 * rand
           d_beta = (c2 * beta[i] - pos[i]).abs
           #warn "d_beta: #{d_beta}"
           x2 = beta[i] - a2 * d_beta
 
-          a3, c3 = 2 * rand - 1, 2 * rand - 1 
+          a3, c3 = a * (2 * rand - 1), 2 * rand
           d_delta = (c3 * delta[i] - pos[i]).abs
           #warn "d_delta: #{d_delta}"
           x3 = delta[i] - a3 * d_delta
-          
           new_positions[i] = (x1 + x2 + x3) / 3.0
           # clip the new position to the boundary of the search space 
           lb = @constraints[:min][i]
