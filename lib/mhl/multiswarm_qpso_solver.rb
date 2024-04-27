@@ -173,7 +173,7 @@ module MHL
       @r_excl = average_space_extension / (2 * @num_swarms)**(1.0 / @constraints.length)
       # default behavior is to loop forever
       begin
-        @logger.debug "r_excl: #{@r_excl} @num_swarms: #{swarms.length}"
+        @logger.debug "r_excl: #{@r_excl} @num_swarms: #{swarms.length}" if @logger
         iter += 1
         @logger.info "MultiSwarm QPSO - Starting iteration #{iter}" if @logger
         @logger.debug "Swarms: #{swarms.length}" if @logger
