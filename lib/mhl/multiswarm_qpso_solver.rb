@@ -203,7 +203,7 @@ module MHL
           # add swarm if all have converge
           @logger&.debug "All swarm converged #{swarms.length}" 
           if swarms.length < @num_swarms # TODO FIX CONSTANT -- MAXIMUM NUMBER OF SWARM
-            @logger&..debug "Adding a new swarm" 
+            @logger&.debug "Adding a new swarm" 
             swarm = ChargedSwarm.new(size: @swarm_size, initial_positions: @init_pos,
               initial_velocities: @init_vel,
               constraints: @constraints, logger: @logger)
