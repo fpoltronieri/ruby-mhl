@@ -158,9 +158,6 @@ module MHL
         # find fittest member
         population_best = population.max_by {|x| x[:fitness] }
 
-        # print results
-        # @logger.info "> gen #{gen}, best: #{population_best[:genotype]}, #{population_best[:fitness]}" unless @quiet
-
         # calculate overall best
         if overall_best.nil?
           overall_best = population_best
